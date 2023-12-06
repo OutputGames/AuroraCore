@@ -1,0 +1,125 @@
+\doxysection{math.\+hpp}
+\hypertarget{math_8hpp_source}{}\label{math_8hpp_source}\index{include/aurora/math/math.hpp@{include/aurora/math/math.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#if\ !defined(MATH\_HPP)}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ MATH\_HPP}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <aurora/utils/utils.hpp>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ Vector2Operators(c,cc)\(\backslash\)}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator=(const\ c\&\ other)\{x\ =\ other.x;\ y\ =\ other.y;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+=(const\ c\&\ other)\{x\ +=\ other.x;y\ +=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/=(const\ c\&\ other)\ \{x\ -\/=\ other.x;y\ -\/=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*=(const\ c\&\ other)\{x\ *=\ other.x;y\ *=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/=(const\ c\&\ other)\ \{x\ /=\ other.x;y\ /=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+(const\ c\&\ other)\{x\ +=\ other.x;y\ +=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/(const\ c\&\ other)\ \{x\ -\/=\ other.x;y\ -\/=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*(const\ c\&\ other)\{x\ *=\ other.x;y\ *=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/(const\ c\&\ other)\ \{x\ /=\ other.x;y\ /=\ other.y;return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<(const\ c\&\ v)\{return\ x\ <\ v.x\ \&\&\ y\ <\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>(const\ c\&\ v)\{return\ x\ >\ v.x\ \&\&\ y\ >\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<=(const\ c\&\ v)\{return\ x\ <=\ v.x\ \&\&\ y\ <=\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>=(const\ c\&\ v)\{return\ x\ >=\ v.x\ \&\&\ y\ >=\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\ \ \ \ bool\ operator==(const\ c\&\ v)\{return\ x\ ==\ v.x\ \&\&\ y\ ==\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\ \ \ \ bool\ operator!=(const\ c\&\ v)\{return\ x\ !=\ v.x\ ||\ y\ !=\ v.y;\}\(\backslash\)}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ Vector3Operators(c,cc)\(\backslash\)}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator=(const\ c\&\ other)\{x\ =\ other.x;\ y\ =\ other.y;\ z\ =\ other.z;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+=(const\ c\&\ other)\{x\ +=\ other.x;y\ +=\ other.y;\ z+=other.z;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/=(const\ c\&\ other)\ \{x\ -\/=\ other.x;y\ -\/=\ other.y;\ z-\/=other.z;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*=(const\ c\&\ other)\{x\ *=\ other.x;y\ *=\ other.y;\ z*=other.z;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/=(const\ c\&\ other)\ \{x\ /=\ other.x;y\ /=\ other.y;\ z/=other.z;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+(const\ c\&\ other)\ \{\ x\ +=\ other.x;\ y\ +=\ other.y;\ z\ +=\ other.z;\ return\ *this;\ \}\(\backslash\)}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/(const\ c\&\ other)\ \{\ x\ -\/=\ other.x;\ y\ -\/=\ other.y;\ z\ -\/=\ other.z;\ return\ *this;\ \}\(\backslash\)}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*(const\ c\&\ other)\ \{\ x\ *=\ other.x;\ y\ *=\ other.y;\ z\ *=\ other.z;\ return\ *this;\ \}\(\backslash\)}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/(const\ c\&\ other)\ \{\ x\ /=\ other.x;\ y\ /=\ other.y;\ z\ /=\ other.z;\ return\ *this;\ \}\(\backslash\)}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<(const\ c\&\ v)\{return\ x\ <\ v.x\ \&\&\ y\ <\ v.y\ \&\&\ z\ <\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>(const\ c\&\ v)\{return\ x\ >\ v.x\ \&\&\ y\ >\ v.y\ \&\&\ z\ >\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<=(const\ c\&\ v)\{return\ x\ <=\ v.x\ \&\&\ y\ <=\ v.y\ \&\&\ z\ <=\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>=(const\ c\&\ v)\{return\ x\ >=\ v.x\ \&\&\ y\ >=\ v.y\ \&\&\ z\ >=\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\ \ \ \ bool\ operator==(const\ c\&\ v)\{return\ x\ ==\ v.x\ \&\&\ y\ ==\ v.y\ \&\&\ z\ ==\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\ \ \ \ bool\ operator!=(const\ c\&\ v)\{return\ x\ !=\ v.x\ ||\ y\ !=\ v.y\ \&\&\ z\ !=\ v.z;\}\(\backslash\)}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ Vector4Operators(c,cc)\(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator=(const\ c\&\ other)\{x\ =\ other.x;\ y\ =\ other.y;\ z\ =\ other.z;\ w\ =\ other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+=(const\ c\&\ other)\{x\ +=\ other.x;y\ +=\ other.y;\ z+=other.z;\ w+=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/=(const\ c\&\ other)\ \{x\ -\/=\ other.x;y\ -\/=\ other.y;\ z-\/=other.z;\ w-\/=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*=(const\ c\&\ other)\{x\ *=\ other.x;y\ *=\ other.y;\ z*=other.z;\ w*=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/=(const\ c\&\ other)\ \{x\ /=\ other.x;y\ /=\ other.y;\ z/=other.z;\ w/=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator+(const\ c\&\ other)\{x\ +=\ other.x;y\ +=\ other.y;\ z+=other.z;\ w+=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator-\/(const\ c\&\ other)\ \{x\ -\/=\ other.x;y\ -\/=\ other.y;\ z-\/=other.z;\ w-\/=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator*(const\ c\&\ other)\{x\ *=\ other.x;y\ *=\ other.y;\ z*=other.z;\ w*=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\ \ \ \ cc\&\ operator/(const\ c\&\ other)\ \{x\ /=\ other.x;y\ /=\ other.y;\ z/=other.z;\ w/=other.w;\ return\ *this;\}\(\backslash\)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<(const\ c\&\ v)\{return\ x\ <\ v.x\ \&\&\ y\ <\ v.y\ \&\&\ z\ <\ v.z\ \&\&\ w\ <\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>(const\ c\&\ v)\{return\ x\ >\ v.x\ \&\&\ y\ >\ v.y\ \&\&\ z\ >\ v.z\ \&\&\ w\ >\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\ \ \ \ bool\ operator<=(const\ c\&\ v)\{return\ x\ <=\ v.x\ \&\&\ y\ <=\ v.y\ \&\&\ z\ <=\ v.z\ \&\&\ w\ <=\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\ \ \ \ bool\ operator>=(const\ c\&\ v)\{return\ x\ >=\ v.x\ \&\&\ y\ >=\ v.y\ \&\&\ z\ >=\ v.z\ \&\&\ w\ >=\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\ \ \ \ bool\ operator==(const\ c\&\ v)\{return\ x\ ==\ v.x\ \&\&\ y\ ==\ v.y\ \&\&\ z\ ==\ v.z\ \&\&\ w\ ==\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\ \ \ \ bool\ operator!=(const\ c\&\ v)\{return\ x\ !=\ v.x\ ||\ y\ !=\ v.y\ \&\&\ z\ !=\ v.z\ \&\&\ w\ !=\ v.w;\}\(\backslash\)}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_vector2}{Vector2}}\ \{}
+\DoxyCodeLine{00059\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{float}\ x=0.0f,\ y=0.0f;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{class_vector2}{Vector2}}(\textcolor{keywordtype}{float}\ vx,\ \textcolor{keywordtype}{float}\ vy)\ \{\ x\ =\ vx;\ y\ =\ vy;\ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ Vector2Operators(glm::vec2,\mbox{\hyperlink{class_vector2}{Vector2}})}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ Vector2Operators(\mbox{\hyperlink{class_vector2}{Vector2}},\mbox{\hyperlink{class_vector2}{Vector2}})}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ Vector2Operators(glm::vec3,\mbox{\hyperlink{class_vector2}{Vector2}})}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ Vector2Operators(glm::vec4,\mbox{\hyperlink{class_vector2}{Vector2}})}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \};}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_vector3}{Vector3}}\ \{}
+\DoxyCodeLine{00075\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{float}\ x\ =\ 0.0f,\ y\ =\ 0.0f,\ z\ =\ 0.0f;}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{class_vector3}{Vector3}}(\textcolor{keywordtype}{float}\ vx,\ \textcolor{keywordtype}{float}\ vy,\ \textcolor{keywordtype}{float}\ vz)\ \{\ x\ =\ vx;\ y\ =\ vy;\ z\ =\ vz;\ \}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ Vector3Operators(\mbox{\hyperlink{class_vector3}{Vector3}},\ \mbox{\hyperlink{class_vector3}{Vector3}})}
+\DoxyCodeLine{00081\ \ \ \ \ Vector3Operators(glm::vec3,\ \mbox{\hyperlink{class_vector3}{Vector3}})}
+\DoxyCodeLine{00082\ \ \ \ \ Vector3Operators(glm::vec4,\ \mbox{\hyperlink{class_vector3}{Vector3}})}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_vector4}{Vector4}}\ \ \{}
+\DoxyCodeLine{00087\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{float}\ x\ =\ 0.0f,\ y\ =\ 0.0f,\ z\ =\ 0.0f,\ w\ =\ 0.0f;}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{class_vector4}{Vector4}}(\textcolor{keywordtype}{float}\ vx,\ \textcolor{keywordtype}{float}\ vy,\ \textcolor{keywordtype}{float}\ vz,\ \textcolor{keywordtype}{float}\ vw)\ \{\ x\ =\ vx;\ y\ =\ vy;\ z\ =\ vz;\ w\ =\ vw;\ \}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ Vector4Operators(\mbox{\hyperlink{class_vector4}{Vector4}},\ \mbox{\hyperlink{class_vector4}{Vector4}})}
+\DoxyCodeLine{00093\ \ \ \ \ Vector4Operators(glm::vec4,\ \mbox{\hyperlink{class_vector4}{Vector4}})}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \};}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_quaternion}{Quaternion}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{class_vector4}{Vector4}}}
+\DoxyCodeLine{00098\ \{}
+\DoxyCodeLine{00099\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{class_quaternion}{Quaternion}}(\textcolor{keywordtype}{float}\ vx,\ \textcolor{keywordtype}{float}\ vy,\ \textcolor{keywordtype}{float}\ vz)\ :\ \mbox{\hyperlink{class_vector4}{Vector4}}(vx,vy,vz,1)\ \{\}}
+\DoxyCodeLine{00101\ \};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_transform}{Transform}}}
+\DoxyCodeLine{00104\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{class_vector3}{Vector3}}\ position;}
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{class_quaternion}{Quaternion}}\ rotation;}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{class_vector3}{Vector3}}\ scale;}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{struct_transform}{Transform}}(nullptr\_t):\ position(0,0,0),\ rotation(0,0,0),\ scale(1,1,1)}
+\DoxyCodeLine{00110\ \ \ \ \ \{}
+\DoxyCodeLine{00111\ \ \ \ \ \}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{struct_transform}{Transform}}()\ :\ position(0,\ 0,\ 0),\ rotation(0,\ 0,\ 0),\ scale(1,\ 1,\ 1)}
+\DoxyCodeLine{00114\ \ \ \ \ \{}
+\DoxyCodeLine{00115\ \ \ \ \ \}}
+\DoxyCodeLine{00116\ \};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ MATH\_HPP}}
+
+\end{DoxyCode}

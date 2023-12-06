@@ -13,5 +13,5 @@ void TestComponent::Init()
 
 void TestComponent::Update()
 {
-	cout << "TestComponent updated" << endl;
+	//cout << "TestComponent updated" << endl;
 }

@@ -1,5 +1,5 @@
 #include "entity.hpp"
-Ref<Entity> EntityMgr::CreateEntity(string name, Ref<Entity> parent)
+Ref<Entity> EntityMgr::CreateEntity(std::string name, Ref<Entity> parent)
 {
 	Entity entity = Entity();
 	entity.Name = name;

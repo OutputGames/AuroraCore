@@ -5,8 +5,6 @@
 #include "aurora/math/math.hpp"
 #include "aurora/utils/utils.hpp"
 
-using namespace std;
-
 struct Entity
 {
 
@@ -23,7 +21,7 @@ struct Entity
 
     void AddChild(Entity Child);
 
-    vector<Ref<Component>> components;
+    std::vector<Ref<Component>> components;
 
     template <typename T, typename... Args>
     T* AttachComponent(Args&&... params);
@@ -52,7 +50,7 @@ template <typename T, typename ... Args>
 T* Entity::AttachComponent(Args&&... params)
 {
     if (!GetComponent<T>()) {
-        components.emplace_back(make_shared< T >(forward< Args >(params)...));
+        components.emplace_back(std::make_shared< T >(forward< Args >(params)...));
         for (auto&& component : components) {
             if (component->IsClassType(T::Type)) {
                 T* comp = static_cast<T*>(component.Get());
@@ -67,9 +65,9 @@ T* Entity::AttachComponent(Args&&... params)
 
 struct EntityMgr
 {
-    vector<Ref<Entity>> registeredEntities;
+	std::vector<Ref<Entity>> registeredEntities;
 
-    Ref<Entity> CreateEntity(string name="", Ref<Entity> parent=nullptr);
+    Ref<Entity> CreateEntity(std::string name="", Ref<Entity> parent=nullptr);
 
     void UpdateAllEntities() const
     {

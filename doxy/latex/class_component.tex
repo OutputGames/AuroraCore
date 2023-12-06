@@ -1,0 +1,50 @@
+\doxysection{Component Class Reference}
+\hypertarget{class_component}{}\label{class_component}\index{Component@{Component}}
+Inheritance diagram for Component\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_component}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_component_aedc8be32d9f44545e60cf6ac52751c4c}\label{class_component_aedc8be32d9f44545e60cf6ac52751c4c} 
+virtual bool {\bfseries Is\+Class\+Type} (const std\+::size\+\_\+t class\+Type) const
+\item 
+\Hypertarget{class_component_ab7b5b4676ca88400a52f66d95c9c828e}\label{class_component_ab7b5b4676ca88400a52f66d95c9c828e} 
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{class_component}{Component}} $>$ {\bfseries clone} () const
+\item 
+\Hypertarget{class_component_a26f84914bf5d77041779e6f84d86117e}\label{class_component_a26f84914bf5d77041779e6f84d86117e} 
+{\bfseries Component} (std\+::string \&\&initial\+Value)
+\item 
+\Hypertarget{class_component_a5a5e595fab62ba757f03becc5b101732}\label{class_component_a5a5e595fab62ba757f03becc5b101732} 
+virtual void {\bfseries Init} ()
+\item 
+\Hypertarget{class_component_aaf2ce6dc5752072492f790ad4c7955bb}\label{class_component_aaf2ce6dc5752072492f790ad4c7955bb} 
+virtual void {\bfseries Update} ()
+\item 
+\Hypertarget{class_component_a78c975ecffa243a1eb321ed7ceb0ac83}\label{class_component_a78c975ecffa243a1eb321ed7ceb0ac83} 
+virtual void {\bfseries Destroy} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_component_afffcb68fa3203b4625c991a3a4c38d39}\label{class_component_afffcb68fa3203b4625c991a3a4c38d39} 
+\mbox{\hyperlink{struct_entity}{Entity}} \texorpdfstring{$\ast$}{*} {\bfseries Entity}
+\item 
+\Hypertarget{class_component_ae83f0fd7bf3c16a500b05f21dba79264}\label{class_component_ae83f0fd7bf3c16a500b05f21dba79264} 
+bool {\bfseries Enabled} = true
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_component_a4363406efc886ea24eeccdac250a598f}\label{class_component_a4363406efc886ea24eeccdac250a598f} 
+static const std\+::size\+\_\+t {\bfseries Type} = std\+::hash$<$const char\texorpdfstring{$\ast$}{*}$>$()(TO\+\_\+\+STRING(\mbox{\hyperlink{class_component}{Component}}))
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/aurora/ecs/component.\+hpp\item 
+include/aurora/ecs/component.\+cpp\end{DoxyCompactItemize}

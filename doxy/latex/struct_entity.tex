@@ -1,0 +1,56 @@
+\doxysection{Entity Struct Reference}
+\hypertarget{struct_entity}{}\label{struct_entity}\index{Entity@{Entity}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_entity_a7e2a7c5df3bceaf41deea192eeba4d8f}\label{struct_entity_a7e2a7c5df3bceaf41deea192eeba4d8f} 
+void {\bfseries Update} ()
+\item 
+\Hypertarget{struct_entity_aa75151fc607686b42d27f8c3ba73143d}\label{struct_entity_aa75151fc607686b42d27f8c3ba73143d} 
+void {\bfseries Destroy} ()
+\item 
+\Hypertarget{struct_entity_a33a384df65645b880ff6ea717f3bbe94}\label{struct_entity_a33a384df65645b880ff6ea717f3bbe94} 
+void {\bfseries Add\+Child} (\mbox{\hyperlink{struct_entity}{Entity}} Child)
+\item 
+\Hypertarget{struct_entity_a1dd3f9b5fae21f0c4c0884e6f12b578b}\label{struct_entity_a1dd3f9b5fae21f0c4c0884e6f12b578b} 
+{\footnotesize template$<$typename T , typename... Args$>$ }\\T \texorpdfstring{$\ast$}{*} {\bfseries Attach\+Component} (Args \&\&... params)
+\item 
+\Hypertarget{struct_entity_a350bdcc5c37bcd893b07ddaae9ae6c18}\label{struct_entity_a350bdcc5c37bcd893b07ddaae9ae6c18} 
+{\footnotesize template$<$typename T $>$ }\\T \texorpdfstring{$\ast$}{*} {\bfseries Get\+Component} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_entity_ac7229f19e6d7f54224ca27de2d097baa}\label{struct_entity_ac7229f19e6d7f54224ca27de2d097baa} 
+u32 {\bfseries Id} =-\/1
+\item 
+\Hypertarget{struct_entity_ae8f30f7e882096be1fe49167a16d8611}\label{struct_entity_ae8f30f7e882096be1fe49167a16d8611} 
+std\+::string {\bfseries Name} ="{}Uninitialized"{}
+\item 
+\Hypertarget{struct_entity_a6220ebc49bd9773afeeecdb9cb0e2abc}\label{struct_entity_a6220ebc49bd9773afeeecdb9cb0e2abc} 
+bool {\bfseries Enabled} =true
+\item 
+\Hypertarget{struct_entity_a2a4dc981c12910344ba007af0f6c7ee5}\label{struct_entity_a2a4dc981c12910344ba007af0f6c7ee5} 
+\mbox{\hyperlink{struct_transform}{Transform}} {\bfseries Transform}
+\item 
+\Hypertarget{struct_entity_a5b25c2bfdd763aeb9d5355554edfbeed}\label{struct_entity_a5b25c2bfdd763aeb9d5355554edfbeed} 
+std\+::vector$<$ Ref$<$ \mbox{\hyperlink{struct_entity}{Entity}} $>$ $>$ {\bfseries Children}
+\item 
+\Hypertarget{struct_entity_aad1850188a2ec405e645fbb5132b580e}\label{struct_entity_aad1850188a2ec405e645fbb5132b580e} 
+Ref$<$ \mbox{\hyperlink{struct_entity}{Entity}} $>$ {\bfseries Parent}
+\item 
+\Hypertarget{struct_entity_aa85a3e7c4a25c4ba29ccbf7a5b2a02d4}\label{struct_entity_aa85a3e7c4a25c4ba29ccbf7a5b2a02d4} 
+std\+::vector$<$ Ref$<$ \mbox{\hyperlink{class_component}{Component}} $>$ $>$ {\bfseries components}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_entity_a8789184abb2a174305789482b095867a}\label{struct_entity_a8789184abb2a174305789482b095867a} 
+struct {\bfseries Entity\+Mgr}
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/aurora/ecs/entity.\+hpp\item 
+include/aurora/ecs/entity.\+cpp\end{DoxyCompactItemize}
