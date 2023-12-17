@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
 	details->Width = 800;
 	details->Height = 600;
 
+	SDLUtils::Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+
 	agl::agl_init(details);
 	agl::complete_init();
 
@@ -46,10 +48,11 @@ int main(int argc, char* argv[])
 
 	agl_ext::InstallExtension<aglPrimitives>(new aglPrimitives);
 
+	agl::aglTexture* equiTex = new agl::aglTexture("testresources/textures/test.hdr", VK_FORMAT_R8G8B8A8_SRGB);
 
 	agl::aglUniformBuffer<TransformationBuffer>* camBuffer;
 
-	agl::aglShader* shader = new agl::aglShader(new agl::aglShader::aglShaderSettings{ "testresources/shaders/flat3d/main.vert","testresources/shaders/flat3d/main.frag" });
+	agl::aglShader* shader = new agl::aglShader(new agl::aglShader::aglShaderSettings{ "testresources/shaders/flat3d/main.vert","testresources/shaders/flat3d/main.frag", VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, VK_COMPARE_OP_LESS_OR_EQUAL });
 
 	agl::aglUniformBufferSettings settings = {};
 
@@ -59,9 +62,9 @@ int main(int argc, char* argv[])
 
 	camBuffer->AttachToShader(shader, shader->GetBindingByName("ubo"));
 
-	agl::aglShader* brdfshader = new agl::aglShader(new agl::aglShader::aglShaderSettings{ "testresources/shaders/brdf/main.vert","testresources/shaders/brdf/main.frag", VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE, VK_COMPARE_OP_ALWAYS });
+	agl::aglShader* brdfshader = new agl::aglShader(new agl::aglShader::aglShaderSettings{ "testresources/shaders/equi/main.vert","testresources/shaders/equi/main.frag", VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, VK_COMPARE_OP_ALWAYS });
 
-	agl::aglTexture* tex = new agl::aglTexture(brdfshader, agl::aglTextureCreationInfo{512,512,4,false});
+	agl::aglTexture* tex = new agl::aglTexture(brdfshader, agl::aglTextureCreationInfo{512,512,equiTex->channels,true, equiTex});
 
 	shader->AttachTexture(tex, shader->GetBindingByName("tex"));
 
@@ -71,19 +74,30 @@ int main(int argc, char* argv[])
 	renderer->material->shader = shader;
 	renderer->mesh = aglPrimitives::prims[aglPrimitives::CUBE];
 
-	while (!glfwWindowShouldClose(agl::window))
+	bool done = false;
+	while (!done)
 	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+				done = true;
+			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(agl::window))
+				done = true;
+		}
+		agl::event = &event;
+
 		agl_ext::Refresh();
 
-		pos -= 0.001f;
+		pos -= 0.0001f;
 
 		entityMgr.UpdateAllEntities();
 
 		float radius = 2;
 
-		camera->position = { sinf(pos)*radius,2,cosf(pos)*radius};
-		camera->target = { 0,0,0 };
-		camera->fov = 75.0f;
+		camera->position = { 0,0,0};
+		camera->target = { sinf(pos) * radius,0,cosf(pos) * radius };
+		camera->fov = 90.0f;
 
 		camera->Update(aglMath::ConvertExtents(agl::baseSurface->framebuffer->extent));
 
@@ -98,6 +112,7 @@ int main(int argc, char* argv[])
 
 		agl::record_command_buffer(agl::currentFrame);
 
+		agl::baseSurface->framebuffer->renderPass->End(agl::baseSurface->commandBuffer->GetCommandBuffer(agl::currentFrame ));
 		agl::FinishRecordingCommandBuffer(agl::currentFrame);
 
 		//agl_ext::installedExtensions[AGL_EXTENSION_IMGUI_LAYER_NAME]->Refresh();

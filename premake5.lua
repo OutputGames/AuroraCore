@@ -15,7 +15,8 @@ project "AuroraCore"
          ".editorconfig",
          "%{_OPTIONS['utilslocation']}/include/**" ,
          "%{_OPTIONS['utilslocation']}/vendor/glm/glm/**" ,
-         "testresources/**"
+         "testresources/**",
+         "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/**" , 
       }
    includedirs {
        "include/", 
@@ -27,8 +28,9 @@ project "AuroraCore"
        "%{_OPTIONS['agllocation']}".."/include/",
        "%{_OPTIONS['agllocation']}".."/vendor/glfw/include",
        "%{_OPTIONS['utilslocation']}".."/vendor/glm", 
+       "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/",
       }
-    libdirs {"%{_OPTIONS['agllocation']}/vendor/glfw/lib-vc2022/","%{_OPTIONS['agllocation']}/vendor/assimp/lib/Release/"}
+    libdirs {"%{_OPTIONS['agllocation']}/vendor/glfw/lib-vc2022/","%{_OPTIONS['agllocation']}/vendor/assimp/lib/Release/", "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/lib" }
     links {"glfw3.lib", "assimp-vc143-mt.lib"}
 
     filter {"options:gfxapi=vulkan"}
@@ -52,11 +54,13 @@ project "AuroraCore"
       debugdir "./"
       runtime "Debug"
       optimize "Off"
+      links {"SDL2d", "SDL2maind"}
 
    filter "configurations:Release"
       defines { "NDEBUG" }
       optimize "On"
       runtime "Release"
+      links {"SDL2", "SDL2main"}
 
    filter "action:vs*" 
       defines{"_WINSOCK_DEPRECATED_NO_WARNINGS", "_CRT_SECURE_NO_WARNINGS"}

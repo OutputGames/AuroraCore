@@ -18,12 +18,12 @@ layout(location = 2) out vec3 fragPos;
 layout(location = 3) out vec3 camPos;
 
 void main() {
-    //gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
 
-    mat4 rotView = mat4(mat3(ubo.view));
-    vec4 clipPos = ubo.proj * rotView * vec4(inPosition, 1.0);
+    //mat4 rotView = mat4(mat3(ubo.view));
+    //vec4 clipPos = ubo.proj * rotView * vec4(inPosition, 1.0);
 
-    gl_Position = clipPos.xyww;
+    //gl_Position = clipPos.xyww;
 
     //gl_Position = vec4(inPosition,1.0);
     fragNormal = ubo.normalMatrix * inNormal;
