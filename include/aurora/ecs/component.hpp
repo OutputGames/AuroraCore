@@ -8,10 +8,10 @@
 public:                                                                                     \
     static const std::size_t Type;                                                          \
     virtual bool IsClassType( const std::size_t classType ) const override;                 \
-    virtual std::shared_ptr<Component> clone() const override                               \
-	{                                                                                       \
-    return std::make_shared<classname>(*this);                                              \
-    }                                                                                       \
+    virtual Ref<Component> clone() const override \
+	{\
+		return Ref<Component>(std::make_shared<classname>(*this));\
+    }\
 
 //****************
 // CLASS_DEFINITION
@@ -40,6 +40,7 @@ public:\
     }\
     classname() = default; \
 
+#include "aurora/math/math.hpp"
 #include "aurora/utils/utils.hpp"
 
 struct Entity;
@@ -50,9 +51,9 @@ public:
     virtual bool                                IsClassType(const std::size_t classType) const {
         return classType == Type;
     }
-    virtual std::shared_ptr<Component> clone() const
+    virtual Ref<Component> clone() const
     {
-        return std::make_shared<Component>(*this);
+        return Ref<Component>(std::make_shared<Component>(*this));
     }
 public:
 
@@ -70,15 +71,19 @@ public:
     virtual void Update() {}
     virtual void Destroy() {}
 
-
 private:
     std::string                             value = "uninitialized";
+
+    friend struct Entity;
+
+    bool Initialized;
 
 };
 
 class TestComponent : public Component
 {
-	CLASS_DECLARATION(TestComponent)
+
+    CLASS_DECLARATION(TestComponent)
 
 public:
 	TestComponent(std::string&& initialValue) : Component(move(initialValue))

@@ -18,15 +18,23 @@ struct TransformationBuffer
 struct Transform
 {
 	glm::vec3 position;
-	glm::quat rotation;
+	glm::vec3 rotation;
 	glm::vec3 scale;
 
-	Transform(nullptr_t): position(0,0,0), rotation(0,0,0,0), scale(1,1,1)
+public:
+
+
+	Transform(nullptr_t): position(0,0,0), rotation(0,0,0), scale(1,1,1)
 	{
 	}
 
-	Transform() : position(0, 0, 0), rotation(0, 0, 0,0), scale(1, 1, 1)
+	Transform() : position(0, 0, 0), rotation(0, 0, 0), scale(1, 1, 1)
 	{
+	}
+
+	void Update()
+	{
+		
 	}
 
 	void ModifyTransformationBuffer(TransformationBuffer* bfr)
@@ -34,7 +42,9 @@ struct Transform
 		mat4 model(1.0);
 
 		model = translate(model, position);
-		model *= toMat4(rotation);
+		model = glm::rotate(model, radians(rotation.x), vec3{ 1,0,0 });
+		model = glm::rotate(model, radians(rotation.y), vec3{ 0,1,0 });
+		model = glm::rotate(model, radians(rotation.z), vec3{ 0,0,1 });
 		model = glm::scale(model, scale);
 
 		mat3 normal = transpose(inverse(mat3(model)));
@@ -45,5 +55,17 @@ struct Transform
 	}
 };
 
+struct aclMath
+{
+	static vec3 resolveZYXToXYZ(vec3 v)
+	{
+		return { -v.z, v.y, v.x };
+	}
+
+	static float random01()
+	{
+		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+};
 
 #endif // MATH_HPP

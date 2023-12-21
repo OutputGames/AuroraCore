@@ -12,18 +12,35 @@ and this project adheres to [Semantic Versioning].
 * Support for procedural texture creation with shaders
 
 * Input module in AuroraUtils using SDL
+    * Support for controller rumble
+    * Support for joystick movement and button pressing
+    * Theoretical support for gyro tracking
+
+* Physics module in AuroraCore using JoltPhysics
+
+* Lighting module in AuroraCore
+    * Support for raytracing (baked and realtime)
+    * Support for PBR
 
 ### Changed
 
-* Graphics backend changed to SDL from GLFW
+* Window creation backend changed to SDL from GLFW
+
+* Added Plane shape to agl_ext_primitives
+
+* Original agl_ext removed
 
 ### Deprecated
 
 ### Removed
 
-* OpenGL Support (No reason to support anymore)
+* OpenGL Support
+    * I'm working on experimental features currently, and I don't want to have to change structures between libraries. Deko3D, Citro3D, and Metal are somewhat related to the structure of Vulkan, meaning there won't be much difference between the two.
+    * **OpenGL support will come back at a later date** when the essential features of the graphics library are completed.
 
 ### Fixed
+
+* Window unable to close with X button using GLFW
 
 ### Security
 
@@ -32,6 +49,7 @@ and this project adheres to [Semantic Versioning].
 * [Deko3d] Support (Nintendo Switch)
 * [Metal] Support (iOS/macOS)
 * [Citro3d] Support (3DS)
+* x86 support
 
 ## 0.0.1 - 2023-12-1
 

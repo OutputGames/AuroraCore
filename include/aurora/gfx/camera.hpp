@@ -1,18 +1,30 @@
 #if !defined(CAMERA_HPP)
 #define CAMERA_HPP
 
+#include "aurora/ecs/component.hpp"
+#include "aurora/ecs/entity.hpp"
 #include "aurora/utils/utils.hpp"
 #include "aurora/math/math.hpp"
 
-struct Camera
+class MeshRenderer;
+
+class aclCamera : public Component
 {
-	vec3 position={0,0,2};
-	vec3 target;
+	CLASS_DECLARATION(aclCamera)
+
+public:
+	aclCamera(std::string&& initialValue) : Component(move(initialValue))
+	{
+	}
+
+	aclCamera();
+
+	vec3 target = {0,0,0};
 	vec3 up = { 0.0,1.0,0.0 };
 	vec3 right = { 1.0,0,0 };
 	float fov = 45.0f;
 
-	void Update(vec2 extents);
+	void Update() override;
 
 	mat4 GetViewMatrix()
 	{
@@ -28,8 +40,10 @@ struct Camera
 	{
 		bfr->view = GetViewMatrix();
 		bfr->proj = GetProjectionMatrix();
-		bfr->camPos = position;
+		bfr->camPos = Entity->Transform.position;
 	}
+
+	inline static aclCamera* Main = nullptr;
 
 private:
 	mat4 view=mat4(1.0), proj=mat4(1.0);

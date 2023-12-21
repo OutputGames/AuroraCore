@@ -16,6 +16,7 @@ struct Entity
     std::vector<Ref<Entity>> Children;
     Ref<Entity> Parent;
 
+    void Init();
     void Update();
     void Destroy();
 
@@ -25,6 +26,8 @@ struct Entity
 
     template <typename T, typename... Args>
     T* AttachComponent(Args&&... params);
+
+    void AttachComponent(Ref<Component> component);
 
     template <typename T>
     T* GetComponent()
@@ -43,6 +46,8 @@ struct Entity
 private:
 
     friend struct EntityMgr;
+
+    
 
 };
 
@@ -68,6 +73,7 @@ struct EntityMgr
 	std::vector<Ref<Entity>> registeredEntities;
 
     Ref<Entity> CreateEntity(std::string name="", Ref<Entity> parent=nullptr);
+    Ref<Entity> DuplicateEntity(Ref<Entity> entity);
 
     void UpdateAllEntities() const
     {

@@ -5,13 +5,13 @@
 #include "aurora/types/color.hpp"
 #include "aurora/utils/utils.hpp"
 
-const int MAX_LIGHTS=16;
+const int MAX_LIGHTS=4;
 
 struct LightingSettings
 {
 	alignas(16) vec3 lightPositions[MAX_LIGHTS];
 	alignas(16) vec3 lightColors[MAX_LIGHTS];
-	alignas(16) float lightPowers[MAX_LIGHTS];
+	alignas(16) vec4 lightPowers;
 	alignas(4) int lightAmount;
 
 	alignas(16) vec3 albedo;
@@ -29,19 +29,19 @@ public:
 	{
 	}
 
-	Light() = default;
+	Light();
 
 	Color Color = {1,1,1};
-	float Power;
+	float Power = 1;
 };
 
 struct aclLightingMgr
 {
-    std::vector<Light> lights;
-	void init();
+    inline static std::vector<Light*> lights;
+	static void Init();
 
 
-	LightingSettings GetLightUBO();
+	static LightingSettings GetLightUBO();
 };
 
 #endif // LIGHTING_HPP

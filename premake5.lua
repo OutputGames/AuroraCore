@@ -17,6 +17,7 @@ project "AuroraCore"
          "%{_OPTIONS['utilslocation']}/vendor/glm/glm/**" ,
          "testresources/**",
          "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/**" , 
+         "vendor/jolt/include/**"
       }
    includedirs {
        "include/", 
@@ -29,8 +30,14 @@ project "AuroraCore"
        "%{_OPTIONS['agllocation']}".."/vendor/glfw/include",
        "%{_OPTIONS['utilslocation']}".."/vendor/glm", 
        "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/",
+       "vendor/jolt/include"
       }
-    libdirs {"%{_OPTIONS['agllocation']}/vendor/glfw/lib-vc2022/","%{_OPTIONS['agllocation']}/vendor/assimp/lib/Release/", "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/lib" }
+    libdirs {
+      "%{_OPTIONS['agllocation']}/vendor/glfw/lib-vc2022/",
+      "%{_OPTIONS['agllocation']}/vendor/assimp/lib/Release/", 
+      "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/lib",
+      "vendor/jolt/lib/"
+    }
     links {"glfw3.lib", "assimp-vc143-mt.lib"}
 
     filter {"options:gfxapi=vulkan"}
