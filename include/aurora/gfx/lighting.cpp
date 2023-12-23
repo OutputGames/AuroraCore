@@ -24,16 +24,16 @@ LightingSettings aclLightingMgr::GetLightUBO()
 	{
 		if (lights.size() <= i)
 		{
-			settings.lightColors[i] = { 1,1,1 };
-			settings.lightPositions[i] = {1,1,1};
+			settings.lightColors[i] = vec4{ 1,1,1,1 };
+			settings.lightPositions[i] = vec4{1,1,1,1};
 			settings.lightPowers[i] = 1.0f;
 			continue;
 		}
 
 		Light light = *lights[i];
 
-		settings.lightColors[i] = { light.Color.r, light.Color.g, light.Color.b };
-		settings.lightPositions[i] = light.Entity->Transform.position;
+		settings.lightColors[i] = { light.Color.r, light.Color.g, light.Color.b,0 };
+		settings.lightPositions[i] = make_vec4(light.Entity->Transform.position);
 		settings.lightPowers[i] = light.Power;
 	}
 

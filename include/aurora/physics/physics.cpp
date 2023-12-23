@@ -62,6 +62,11 @@ void Rigidbody::SetVelocity(vec3 velocity)
 	aclPhysicsMgr::bodyInterface->SetLinearVelocity(body->GetID(), aclPhysicsMgr::GetVec3(velocity));
 }
 
+void Rigidbody::ApplyForce(vec3 force)
+{
+	aclPhysicsMgr::bodyInterface->MoveKinematic(body->GetID(), aclPhysicsMgr::GetVec3(Entity->Transform.position+force), body->GetRotation(), 1.0f/60.0f);
+}
+
 void Rigidbody::SetRestitution(float f)
 {
 	body->SetRestitution(f);
@@ -178,6 +183,12 @@ void aclPhysicsMgr::Setup()
 
 void aclPhysicsMgr::Update(float cDeltaTime)
 {
+
+	if (frameCount == 0)
+	{
+		system->OptimizeBroadPhase();
+	}
+
 	// We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
 
 	// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
@@ -191,6 +202,8 @@ void aclPhysicsMgr::Update(float cDeltaTime)
 
 	// Step the world
 	system->Update(cDeltaTime, cCollisionSteps, tempAllocator, jobSystem);
+
+	frameCount++;
 }
 
 JPH::Body* aclPhysicsMgr::CreateBody(JPH::BodyCreationSettings settings)

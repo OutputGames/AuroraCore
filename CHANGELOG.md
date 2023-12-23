@@ -11,16 +11,19 @@ and this project adheres to [Semantic Versioning].
 
 * Support for procedural texture creation with shaders
 
-* Input module in AuroraUtils using SDL
+* Input module in AuroraUtils using [SDL](https://www.libsdl.org)
     * Support for controller rumble
     * Support for joystick movement and button pressing
     * Theoretical support for gyro tracking
 
-* Physics module in AuroraCore using JoltPhysics
+* Physics module in `AuroraCore` using [JoltPhysics](https://github.com/jrouwe/JoltPhysics)
 
 * Lighting module in AuroraCore
-    * Support for raytracing (baked and realtime)
     * Support for PBR
+
+* Compute Shader Support
+
+* `AuroraCore.Math` now has random number support (basic, only 0 to 1)
 
 ### Changed
 
@@ -29,6 +32,11 @@ and this project adheres to [Semantic Versioning].
 * Added Plane shape to agl_ext_primitives
 
 * Original agl_ext removed
+
+* AuroraCore now builds to a library and not an executable file
+    * #### Things the DLL Update changed
+        * Uniform buffers no longer use a template to prevent explicit instantiation
+
 
 ### Deprecated
 
@@ -42,13 +50,14 @@ and this project adheres to [Semantic Versioning].
 
 * Window unable to close with X button using GLFW
 
+
 ### Security
 
 ### Planned
 
-* [Deko3d] Support (Nintendo Switch)
-* [Metal] Support (iOS/macOS)
-* [Citro3d] Support (3DS)
+* [Deko3d]() Support (Nintendo Switch)
+* [Metal]() Support (iOS/macOS)
+* [Citro3d]() Support (3DS)
 * x86 support
 
 ## 0.0.1 - 2023-12-1

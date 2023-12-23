@@ -5,7 +5,7 @@
 
 
 
-class AudioPlayer : public Component
+class AURORA_API AudioPlayer : public Component
 {
 	CLASS_DECLARATION(AudioPlayer)
 

@@ -30,7 +30,7 @@ namespace Layers
 };
 
 /// Class that determines if two object layers can collide
-class aclObjectLayerPairFilter : public JPH::ObjectLayerPairFilter
+class AURORA_API aclObjectLayerPairFilter : public JPH::ObjectLayerPairFilter
 {
 public:
 	virtual bool					ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const override
@@ -62,7 +62,7 @@ namespace BroadPhaseLayers
 
 // BroadPhaseLayerInterface implementation
 // This defines a mapping between object and broadphase layers.
-class aclBPLayerInterface final : public JPH::BroadPhaseLayerInterface
+class AURORA_API aclBPLayerInterface final : public JPH::BroadPhaseLayerInterface
 {
 public:
 	aclBPLayerInterface()
@@ -100,7 +100,7 @@ private:
 };
 
 /// Class that determines if an object layer can collide with a broadphase layer
-class aclObjectBroadPhaseLayerFilter : public JPH::ObjectVsBroadPhaseLayerFilter
+class AURORA_API aclObjectBroadPhaseLayerFilter : public JPH::ObjectVsBroadPhaseLayerFilter
 {
 public:
 	virtual bool				ShouldCollide(JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2) const override
@@ -119,7 +119,7 @@ public:
 };
 
 // An example contact listener
-class aclContactListener : public JPH::ContactListener
+class AURORA_API aclContactListener : public JPH::ContactListener
 {
 public:
 	// See: ContactListener
@@ -148,7 +148,7 @@ public:
 };
 
 // An example activation listener
-class aclBodyActivationListener : public JPH::BodyActivationListener
+class AURORA_API aclBodyActivationListener : public JPH::BodyActivationListener
 {
 public:
 	virtual void		OnBodyActivated(const JPH::BodyID& inBodyID, uint64 inBodyUserData) override
@@ -162,7 +162,7 @@ public:
 	}
 };
 
-struct aclPhysicsMgr
+struct AURORA_API aclPhysicsMgr
 {
 	IS JPH::PhysicsSystem* system;
 	IS aclBodyActivationListener bodyActivationListener = {};
@@ -194,9 +194,12 @@ struct aclPhysicsMgr
 	{
 		return JPH::RVec3(v.x, v.y, v.z);
 	}
+
+private:
+	IS int frameCount;
 };
 
-class Collider : public Component
+class AURORA_API Collider : public Component
 {
 	CLASS_DECLARATION(Collider)
 
@@ -219,7 +222,7 @@ private:
 
 };
 
-class BoxCollider : public Collider
+class AURORA_API BoxCollider : public Collider
 {
 	CLASS_DECLARATION(BoxCollider)
 
@@ -245,7 +248,7 @@ private:
 
 };
 
-class SphereCollider : public Collider
+class AURORA_API SphereCollider : public Collider
 {
 	CLASS_DECLARATION(SphereCollider)
 
@@ -273,7 +276,7 @@ private:
 	JPH::SphereShape* shape;
 };
 
-class Rigidbody : public Component
+class AURORA_API Rigidbody : public Component
 {
 	CLASS_DECLARATION(Rigidbody)
 
@@ -288,6 +291,8 @@ public:
 	void Update() override;
 	void SetPosition(vec3 position);
 	void SetVelocity(vec3 velocity);
+
+	void ApplyForce(vec3 force);
 
 	void SetRestitution(float f);
 

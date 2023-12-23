@@ -17,21 +17,18 @@ void MeshRenderer::Update()
 	if (!material->shader->setup)
 	{
 		if (material->shader->GetBindingByName("transformationBuffer") != -1){
-			agl::aglUniformBufferSettings settings = {};
+			agl::aglBufferSettings settings = {VK_SHADER_STAGE_VERTEX_BIT, sizeof(TransformationBuffer)};
 
-			settings.flags = VK_SHADER_STAGE_VERTEX_BIT;
-
-			transformationBuffer = new agl::aglUniformBuffer<TransformationBuffer>(material->shader, settings);
+			transformationBuffer = new agl::aglUniformBuffer(material->shader, settings);
 
 			transformationBuffer->AttachToShader(material->shader, material->shader->GetBindingByName("transformationBuffer"));
 		}
 
 		if (material->shader->GetBindingByName("lightingSettings") != -1){
-			agl::aglUniformBufferSettings settings = {};
+			agl::aglBufferSettings settings = {VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(LightingSettings)};
 
-			settings.flags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-			lightingBuffer = new agl::aglUniformBuffer<LightingSettings>(material->shader, settings);
+			lightingBuffer = new agl::aglUniformBuffer(material->shader, settings);
 
 			lightingBuffer->AttachToShader(material->shader, material->shader->GetBindingByName("lightingSettings"));
 		}
@@ -43,7 +40,7 @@ void MeshRenderer::Update()
 	Entity->Transform.ModifyTransformationBuffer(&ubo);
 	aclCamera::Main->ModifyTransformationBuffer(&ubo);
 
-	transformationBuffer->Update(ubo);
+	transformationBuffer->Update(&ubo, sizeof(ubo));
 	if (lightingBuffer != nullptr) {
 
 		auto lightUBO = aclLightingMgr::GetLightUBO();
@@ -52,8 +49,8 @@ void MeshRenderer::Update()
 		lightUBO.roughness = roughness;
 		lightUBO.metallic = metallic;
 
-		lightingBuffer->Update(lightUBO);
+		lightingBuffer->Update(&lightUBO, sizeof(lightUBO));
 	}
 
-	agl::baseSurface->framebuffer->renderPass->renderQueue->AttachQueueEntry({ mesh, material->shader });
+	agl::GetSurfaceDetails()->framebuffer->renderPass->renderQueue->AttachQueueEntry({ mesh, material->shader });
 }

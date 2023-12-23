@@ -7,10 +7,10 @@
 
 const int MAX_LIGHTS=4;
 
-struct LightingSettings
+struct AURORA_API LightingSettings
 {
-	alignas(16) vec3 lightPositions[MAX_LIGHTS];
-	alignas(16) vec3 lightColors[MAX_LIGHTS];
+	alignas(16) vec4 lightPositions[MAX_LIGHTS];
+	alignas(16) vec4 lightColors[MAX_LIGHTS];
 	alignas(16) vec4 lightPowers;
 	alignas(4) int lightAmount;
 
@@ -20,7 +20,7 @@ struct LightingSettings
 };
 
 
-class Light : public Component
+class AURORA_API Light : public Component
 {
 	CLASS_DECLARATION(Light)
 
@@ -35,7 +35,7 @@ public:
 	float Power = 1;
 };
 
-struct aclLightingMgr
+struct AURORA_API aclLightingMgr
 {
     inline static std::vector<Light*> lights;
 	static void Init();

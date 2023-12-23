@@ -17,7 +17,7 @@ aclCamera::aclCamera()
 
 void aclCamera::Update()
 {
-	vec2 extent = aglMath::ConvertExtents(agl::baseSurface->framebuffer->extent);
+	vec2 extent = agl::GetMainFramebufferSize();
 
 	vec3 direction = normalize(Entity->Transform.position - target);
 
@@ -27,6 +27,6 @@ void aclCamera::Update()
 
 	view = lookAt(Entity->Transform.position, target, up);
 
-	proj = glm::perspective(glm::radians(fov), flt extent.x / flt extent.y, 0.1f, 100.0f);
+	proj = glm::perspective(glm::radians(fov), flt extent.x / flt extent.y, 0.1f, 10000.0f);
 	proj[1][1] *= -1;
 }

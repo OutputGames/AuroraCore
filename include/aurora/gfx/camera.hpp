@@ -8,7 +8,7 @@
 
 class MeshRenderer;
 
-class aclCamera : public Component
+class AURORA_API aclCamera : public Component
 {
 	CLASS_DECLARATION(aclCamera)
 

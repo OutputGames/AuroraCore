@@ -45,7 +45,7 @@ public:\
 
 struct Entity;
 
-class Component {
+class AURORA_API Component {
 public:
     static const std::size_t                    Type;
     virtual bool                                IsClassType(const std::size_t classType) const {

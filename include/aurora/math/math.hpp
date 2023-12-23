@@ -6,7 +6,7 @@
 #include "glm/gtx/quaternion.hpp"
 
 
-struct TransformationBuffer
+struct AURORA_API TransformationBuffer
 {
 	alignas(16) mat4 model;
 	alignas(16) mat4 view;
@@ -15,7 +15,7 @@ struct TransformationBuffer
 	alignas(16) vec3 camPos;
 };
 
-struct Transform
+struct AURORA_API Transform
 {
 	glm::vec3 position;
 	glm::vec3 rotation;
@@ -55,7 +55,7 @@ public:
 	}
 };
 
-struct aclMath
+struct AURORA_API aclMath
 {
 	static vec3 resolveZYXToXYZ(vec3 v)
 	{

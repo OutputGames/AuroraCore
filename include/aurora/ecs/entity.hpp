@@ -5,7 +5,7 @@
 #include "aurora/math/math.hpp"
 #include "aurora/utils/utils.hpp"
 
-struct Entity
+struct AURORA_API Entity
 {
 
     u32 Id=-1;
@@ -68,7 +68,7 @@ T* Entity::AttachComponent(Args&&... params)
     return static_cast<T*>(nullptr);
 }
 
-struct EntityMgr
+struct AURORA_API EntityMgr
 {
 	std::vector<Ref<Entity>> registeredEntities;
 

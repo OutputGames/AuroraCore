@@ -7,7 +7,7 @@
 #include "aurora/utils/utils.hpp"
 
 
-class MeshRenderer : public Component
+class AURORA_API MeshRenderer : public Component
 {
 	CLASS_DECLARATION(MeshRenderer)
 
@@ -33,8 +33,8 @@ private:
 
 	friend class aclCamera;
 
-	agl::aglUniformBuffer<TransformationBuffer>* transformationBuffer = nullptr;
-	agl::aglUniformBuffer<LightingSettings>* lightingBuffer = nullptr;
+	agl::aglUniformBuffer* transformationBuffer = nullptr;
+	agl::aglUniformBuffer* lightingBuffer = nullptr;
 
 };
 
