@@ -17,7 +17,9 @@ project "AuroraCore"
          "%{_OPTIONS['utilslocation']}/vendor/glm/glm/**" ,
          "testresources/**",
          "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/**" , 
-         "vendor/jolt/include/**"
+         "vendor/jolt/include/**",
+         --"vendor/enet/*.c",
+         "vendor/enet/include/**",
       }
    includedirs {
        "include/", 
@@ -30,17 +32,19 @@ project "AuroraCore"
        "%{_OPTIONS['agllocation']}".."/vendor/glfw/include",
        "%{_OPTIONS['utilslocation']}".."/vendor/glm", 
        "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/include/",
-       "vendor/jolt/include/"
+       "vendor/jolt/include/",
+       "vendor/enet/include/",
       }
     libdirs {
       "%{_OPTIONS['agllocation']}/vendor/glfw/lib-vc2022/",
       "%{_OPTIONS['agllocation']}/vendor/assimp/lib/Release/", 
       "%{_OPTIONS['utilslocation']}".."/vendor/sdl2/lib",
-      "vendor/jolt/lib/"
+      "vendor/jolt/lib/",
+      "vendor/enet/"
     }
 
     
-    links {"vulkan-1.lib"}
+    links {"vulkan-1.lib", "enet64"}
     libdirs {"C:/VulkanSDK/1.3.250.0/Lib"}
     includedirs {"C:/VulkanSDK/1.3.250.0/Include"}
     --files {"%{_OPTIONS['agllocation']}/vendor/imgui/backends/imgui_impl_vulkan.*"}
@@ -68,4 +72,4 @@ project "AuroraCore"
    filter "system:windows"
       defines {"_WIN32"}
       libdirs {"bin/%{cfg.buildcfg}/"}
-      links {"winmm", "kernel32"}
+      links {"winmm", "ws2_32", "kernel32"}

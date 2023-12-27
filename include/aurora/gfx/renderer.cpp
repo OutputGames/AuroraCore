@@ -1,7 +1,9 @@
 #include "renderer.hpp"
 
 #include "camera.hpp"
+#include "agl/agl_ext.hpp"
 #include "aurora/ecs/entity.hpp"
+#include "aurora/ecs/scene.hpp"
 
 CLASS_DEFINITION(Component, MeshRenderer)
 
@@ -38,12 +40,12 @@ void MeshRenderer::Update()
 
 	TransformationBuffer ubo{};
 	Entity->Transform.ModifyTransformationBuffer(&ubo);
-	aclCamera::Main->ModifyTransformationBuffer(&ubo);
+	Camera::Main->ModifyTransformationBuffer(&ubo);
 
 	transformationBuffer->Update(&ubo, sizeof(ubo));
 	if (lightingBuffer != nullptr) {
 
-		auto lightUBO = aclLightingMgr::GetLightUBO();
+		auto lightUBO = Scene::Current->lightingMgr->GetLightUBO();
 
 		lightUBO.albedo = color;
 		lightUBO.roughness = roughness;
@@ -53,4 +55,47 @@ void MeshRenderer::Update()
 	}
 
 	agl::GetSurfaceDetails()->framebuffer->renderPass->renderQueue->AttachQueueEntry({ mesh, material->shader });
+}
+
+nlohmann::json MeshRenderer::Serialize()
+{
+	nlohmann::json j = Component::Serialize();
+
+	j["Color"] = MathSerializer::SerializeVec3(color);
+	j["Roughness"] = roughness;
+	j["Metallic"] = metallic;
+	j["Mesh"] = mesh->path;
+	j["MeshIndex"] = mesh->meshIndex;
+	j["Material"] = {
+		{"Shader", material->shader->Serialize()},
+	};
+
+	return j;
+}
+
+void MeshRenderer::Load(nlohmann::json j)
+{
+	if (aglPrimitives::GetPrims().size() == 0)
+	{
+		agl_ext::InstallExtension<aglPrimitives>();
+	}
+
+	color = MathSerializer::DeserializeVec3(j["Color"]);
+
+	roughness = j["Roughness"];
+	metallic = j["Metallic"];
+
+	const std::vector<std::string> primitivePaths = aglPrimitives::GetPrimNames();
+
+	if (uvector::GetIndexOfElement<std::string>(primitivePaths, j["Mesh"]) == -1)
+	{
+		mesh = agl::aglMesh::GrabMesh(j["Mesh"], j["MeshIndex"]);
+	}
+	else
+	{
+		mesh = aglPrimitives::GetPrims()[static_cast<aglPrimitives::aglPrimitiveType>(uvector::GetIndexOfElement<std::string>(primitivePaths, j["Mesh"]))];
+	}
+
+	material->shader = agl::aglShaderFactory::GetShader(j["Material"]["Shader"]["Id"]);
+
 }

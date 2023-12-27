@@ -20,6 +20,9 @@ public:
 
 	void SetAudio(Sound* audio);
 
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
+
 	float Pitch = 1.f, Volume = 1.f;
 	bool Loop=false;
 

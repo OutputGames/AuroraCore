@@ -34,6 +34,24 @@ void AudioPlayer::SetAudio(Sound* audio)
 	this->audio = audio;
 }
 
+nlohmann::json AudioPlayer::Serialize()
+{
+	nlohmann::json j = Component::Serialize();
+
+	j["Pitch"] = Pitch;
+	j["Volume"] = Volume;
+	j["Loop"] = Loop;
+
+	return j;
+}
+
+void AudioPlayer::Load(nlohmann::json j)
+{
+	Pitch = j["Pitch"];
+	Volume = j["Volume"];
+	Loop = j["Loop"];
+}
+
 void AudioPlayer::Play()
 {
 	audio->Play(audioMgr);

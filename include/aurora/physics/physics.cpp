@@ -1,10 +1,12 @@
 #include "physics.hpp"
 
 #include "aurora/ecs/entity.hpp"
+#include "aurora/ecs/scene.hpp"
 
 CLASS_DEFINITION(Component, Collider)
 CLASS_DEFINITION(Collider, BoxCollider)
 CLASS_DEFINITION(Collider, SphereCollider)
+CLASS_DEFINITION(Collider, CapsuleCollider)
 CLASS_DEFINITION(Component, Rigidbody)
 
 JPH::ShapeSettings* SphereCollider::GetShapeSettings()
@@ -32,6 +34,20 @@ void SphereCollider::ApplyShape(JPH::Shape* shape)
 	this->shape = static_cast<JPH::SphereShape*>(shape);
 }
 
+nlohmann::json SphereCollider::Serialize()
+{
+	nlohmann::json j = Collider::Serialize();
+
+	j["Radius"] = Radius;
+
+	return j;
+}
+
+void SphereCollider::Load(nlohmann::json j)
+{
+	Radius = j["Radius"];
+}
+
 void Rigidbody::Init()
 {
 	Collider* collider = Entity->GetComponent<Collider>();
@@ -40,12 +56,33 @@ void Rigidbody::Init()
 
 	body = aclPhysicsMgr::CreateBody(aclPhysicsMgr::GetCreationSettings(collider->GetShapeSettings(), Entity->Transform.position, quat(Entity->Transform.rotation), static_cast<JPH::EMotionType>(motionType), layer));
 
+	body->SetUserData(Entity->Id);
+
 	initialPosition = Entity->Transform.position;
+	initialRotation = Entity->Transform.rotation;
 
 }
 
 void Rigidbody::Update()
 {
+
+	vec3 pos = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition());
+	vec3 rot = aclPhysicsMgr::GetVec3(body->GetRotation().GetEulerAngles());
+
+	if (constraint & LOCK_POSITION_X)
+		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ initialPosition.x,pos.y,pos.z }), GetActivationType());
+	if (constraint & LOCK_POSITION_Y)
+		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ pos.x,initialPosition.y,pos.z }), GetActivationType());
+	if (constraint & LOCK_POSITION_Z)
+		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ pos.x,pos.y,initialPosition.z}), GetActivationType());
+
+	if (constraint & LOCK_ROTATION_X)
+		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ initialRotation.x*DEG2RAD,rot.y,rot.z }), GetActivationType());
+	if (constraint & LOCK_ROTATION_Y)
+		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ rot.x,initialRotation.y*DEG2RAD,rot.z }), GetActivationType());
+	if (constraint & LOCK_ROTATION_Z)
+		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ rot.x,rot.y,initialRotation.z*DEG2RAD }), GetActivationType());
+		
 	Entity->Transform.position = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition());
 
 	Entity->Transform.rotation = aclPhysicsMgr::GetVec3(body->GetRotation().GetEulerAngles()) * vec3 { RAD2DEG };
@@ -55,6 +92,12 @@ void Rigidbody::Update()
 void Rigidbody::SetPosition(vec3 position)
 {
 	aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(position), GetActivationType());
+}
+
+void Rigidbody::SetRotation(vec3 rotation)
+{
+	aclPhysicsMgr::bodyInterface->SetPositionAndRotation(body->GetID(), body->GetCenterOfMassPosition(), aclPhysicsMgr::GetQuat(rotation), GetActivationType());
+		
 }
 
 void Rigidbody::SetVelocity(vec3 velocity)
@@ -72,11 +115,27 @@ void Rigidbody::SetRestitution(float f)
 	body->SetRestitution(f);
 }
 
+nlohmann::json Rigidbody::Serialize()
+{
+	nlohmann::json j = Component::Serialize();
+
+	j["MotionType"] = motionType;
+
+	return j;
+}
+
+void Rigidbody::Load(nlohmann::json j)
+{
+	motionType = j["MotionType"];
+}
+
 void Rigidbody::Reset()
 {
 	SetPosition(initialPosition);
+	SetRotation(initialRotation);
 	SetVelocity(vec3{ 0 });
 }
+
 
 JPH::ShapeSettings* BoxCollider::GetShapeSettings()
 {
@@ -102,6 +161,20 @@ void BoxCollider::Update()
 void BoxCollider::ApplyShape(JPH::Shape* shape)
 {
 	this->shape = static_cast<JPH::BoxShape*>(shape);
+}
+
+nlohmann::json BoxCollider::Serialize()
+{
+	nlohmann::json j = Collider::Serialize();
+
+	j["Extents"] = MathSerializer::SerializeVec3(Extents);
+
+	return j;
+}
+
+void BoxCollider::Load(nlohmann::json j)
+{
+	Extents = MathSerializer::DeserializeVec3(j["Extents"]);
 }
 
 
@@ -132,6 +205,96 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 };
 
 #endif // JPH_ENABLE_ASSERTS
+
+JPH::ValidateResult aclContactListener::OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2,
+	JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult)
+{
+	//std::cout << "Contact validate callback" << std::endl;
+
+	// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
+	return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
+}
+
+void aclContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2,
+	const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+{
+
+	Ref<Entity> entity1 = Scene::Current->entityMgr->registeredEntities[inBody1.GetUserData()];
+	Ref<Entity> entity2 = Scene::Current->entityMgr->registeredEntities[inBody2.GetUserData()];
+
+	Collision* collision = new Collision;
+
+	collision->collider1 = entity1->GetComponent<Collider>();
+	collision->collider2 = entity2->GetComponent<Collider>();
+
+	collision->hitNormal = aclPhysicsMgr::GetVec3(inManifold.mWorldSpaceNormal);
+
+	int i = 0;
+
+	for (auto m_relative_contact_points_on1 : inManifold.mRelativeContactPointsOn1)
+	{
+		collision->collider1ContactPoints.push_back(aclPhysicsMgr::GetVec3(inManifold.GetWorldSpaceContactPointOn1(i)));
+		i++;
+	}
+
+	i = 0;
+	for (auto m_relative_contact_points_on1 : inManifold.mRelativeContactPointsOn2)
+	{
+		collision->collider2ContactPoints.push_back(aclPhysicsMgr::GetVec3(inManifold.GetWorldSpaceContactPointOn2(i)));
+		i++;
+	}
+
+	entity1->OnCollisionEnter(collision);
+	entity2->OnCollisionEnter(collision);
+
+	delete collision;
+
+	//std::cout << "A contact was added" << std::endl;
+}
+
+void aclContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2,
+	const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+{
+
+
+	Ref<Entity> entity1 = Scene::Current->entityMgr->registeredEntities[inBody1.GetUserData()];
+	Ref<Entity> entity2 = Scene::Current->entityMgr->registeredEntities[inBody2.GetUserData()];
+
+	Collision* collision = new Collision;
+
+	collision->collider1 = entity1->GetComponent<Collider>();
+	collision->collider2 = entity2->GetComponent<Collider>();
+
+	collision->hitNormal = aclPhysicsMgr::GetVec3(inManifold.mWorldSpaceNormal);
+
+	int i = 0;
+
+	for (auto m_relative_contact_points_on1 : inManifold.mRelativeContactPointsOn1)
+	{
+		collision->collider1ContactPoints.push_back(aclPhysicsMgr::GetVec3(inManifold.GetWorldSpaceContactPointOn1(i)));
+		i++;
+	}
+
+	i = 0;
+	for (auto m_relative_contact_points_on1 : inManifold.mRelativeContactPointsOn2)
+	{
+		collision->collider2ContactPoints.push_back(aclPhysicsMgr::GetVec3(inManifold.GetWorldSpaceContactPointOn2(i)));
+		i++;
+	}
+
+	entity1->OnCollisionStay(collision);
+	entity2->OnCollisionStay(collision);
+
+	delete collision;
+
+	//std::cout << "A contact was persisted" << std::endl;
+}
+
+void aclContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
+{
+
+	//std::cout << "A contact was removed" << std::endl;
+}
 
 void aclPhysicsMgr::Setup()
 {
@@ -206,6 +369,26 @@ void aclPhysicsMgr::Update(float cDeltaTime)
 	frameCount++;
 }
 
+void aclPhysicsMgr::Destroy()
+{
+	if (bodies.size() > 0) {
+		bodyInterface->RemoveBodies(bodies.data(), bodies.size());
+		bodyInterface->DestroyBodies(bodies.data(), bodies.size());
+	}
+
+	bodies.clear();
+}
+
+void aclPhysicsMgr::Uninitialize()
+{
+	// Unregisters all types with the factory and cleans up the default material
+	JPH::UnregisterTypes();
+
+	// Destroy the factory
+	delete JPH::Factory::sInstance;
+	JPH::Factory::sInstance = nullptr;
+}
+
 JPH::Body* aclPhysicsMgr::CreateBody(JPH::BodyCreationSettings settings)
 {
 
@@ -226,7 +409,10 @@ JPH::Body* aclPhysicsMgr::CreateBody(JPH::BodyCreationSettings settings)
 		activation = JPH::EActivation::Activate;
 	}
 
+
 	bodyInterface->AddBody(body->GetID(), activation);
+
+	bodies.push_back(body->GetID());
 
 	return body;
 }
@@ -246,4 +432,41 @@ JPH::ShapeSettings* Collider::GetShapeSettings()
 void Collider::ApplyShape(JPH::Shape* shape)
 {
 
+}
+
+void CapsuleCollider::ApplyShape(JPH::Shape* shape)
+{
+	this->shape = static_cast<JPH::CapsuleShape*>(shape);
+}
+
+JPH::Shape* CapsuleCollider::GetShape()
+{
+	return shape;
+}
+
+JPH::ShapeSettings* CapsuleCollider::GetShapeSettings()
+{
+	return new JPH::CapsuleShapeSettings{ Height, Radius };
+}
+
+void CapsuleCollider::Load(nlohmann::json j)
+{
+	Radius = j["Radius"];
+	Height = j["Height"];
+}
+
+nlohmann::json CapsuleCollider::Serialize()
+{
+	json j = Collider::Serialize();
+
+	j["Radius"] = Radius;
+	j["Height"] = Height;
+
+	return j;
+}
+
+
+void CapsuleCollider::Update()
+{
+	
 }

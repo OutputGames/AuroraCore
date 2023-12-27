@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog],
 and this project adheres to [Semantic Versioning].
 
-## 0.0.2 - 2023-12-17 (The SDL Update)
+## 0.0.2 - 2024-1-1 (The SDL Update)
 
 ### Added
 
@@ -17,13 +17,24 @@ and this project adheres to [Semantic Versioning].
     * Theoretical support for gyro tracking
 
 * Physics module in `AuroraCore` using [JoltPhysics](https://github.com/jrouwe/JoltPhysics)
+    * OnCollisionEnter, OnCollisionExit, OnCollisionStay functions added to components
 
 * Lighting module in AuroraCore
     * Support for PBR
 
+* `AuroraCore.Math` now has random number support (basic, only 0 to 1)
+
 * Compute Shader Support
 
-* `AuroraCore.Math` now has random number support (basic, only 0 to 1)
+* More customization for render passes (image layout)
+
+* Texture Mipmapping
+
+* Scene Control (Serialization, Deserialization)
+
+* Network Module in `AuroraCore` using [Enet](https://github.com/lsalzman/enet)
+
+
 
 ### Changed
 
@@ -49,7 +60,6 @@ and this project adheres to [Semantic Versioning].
 ### Fixed
 
 * Window unable to close with X button using GLFW
-
 
 ### Security
 

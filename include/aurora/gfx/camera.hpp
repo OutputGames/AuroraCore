@@ -6,44 +6,36 @@
 #include "aurora/utils/utils.hpp"
 #include "aurora/math/math.hpp"
 
-class MeshRenderer;
-
-class AURORA_API aclCamera : public Component
+class AURORA_API Camera : public Component
 {
-	CLASS_DECLARATION(aclCamera)
+	CLASS_DECLARATION(Camera)
 
 public:
-	aclCamera(std::string&& initialValue) : Component(move(initialValue))
-	{
-	}
+	Camera(std::string&& initialValue);
 
-	aclCamera();
+	Camera();
 
 	vec3 target = {0,0,0};
 	vec3 up = { 0.0,1.0,0.0 };
 	vec3 right = { 1.0,0,0 };
+	vec3 forward = { 0,0,1 };
 	float fov = 45.0f;
+
+	float nearPlane = 0.1f;
+	float farPlane = 10000.0f;
+
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
 
 	void Update() override;
 
-	mat4 GetViewMatrix()
-	{
-		return view;
-	}
+	mat4 GetViewMatrix();
 
-	mat4 GetProjectionMatrix()
-	{
-		return proj;
-	}
+	mat4 GetProjectionMatrix();
 
-	void ModifyTransformationBuffer(TransformationBuffer* bfr)
-	{
-		bfr->view = GetViewMatrix();
-		bfr->proj = GetProjectionMatrix();
-		bfr->camPos = Entity->Transform.position;
-	}
+	void ModifyTransformationBuffer(TransformationBuffer* bfr);
 
-	inline static aclCamera* Main = nullptr;
+	inline static Camera* Main = nullptr;
 
 private:
 	mat4 view=mat4(1.0), proj=mat4(1.0);

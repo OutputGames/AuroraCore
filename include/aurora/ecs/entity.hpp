@@ -2,8 +2,12 @@
 #define ENTITY_HPP
 
 #include "component.hpp"
+#include "json.hpp"
 #include "aurora/math/math.hpp"
 #include "aurora/utils/utils.hpp"
+
+class Collider;
+struct Collision;
 
 struct AURORA_API Entity
 {
@@ -14,13 +18,15 @@ struct AURORA_API Entity
     Transform Transform;
 
     std::vector<Ref<Entity>> Children;
-    Ref<Entity> Parent;
+    Ref<Entity> Parent = nullptr;
 
-    void Init();
+    void Init() const;
     void Update();
     void Destroy();
 
-    void AddChild(Entity Child);
+    void AddChild(Ref<Entity> Child);
+
+    void SetParent(Ref<Entity> Parent);
 
     std::vector<Ref<Component>> components;
 
@@ -28,6 +34,8 @@ struct AURORA_API Entity
     T* AttachComponent(Args&&... params);
 
     void AttachComponent(Ref<Component> component);
+
+    Ref<Component> AttachComponent(std::string name);
 
     template <typename T>
     T* GetComponent()
@@ -43,12 +51,20 @@ struct AURORA_API Entity
         return static_cast<T*>(nullptr);
     }
 
-private:
-
     friend struct EntityMgr;
 
-    
+    void OnCollisionEnter(Collision* other) const;
+    void OnCollisionExit(Collider* other) const;
+    void OnCollisionStay(Collision* other) const;
 
+    nlohmann::json Serialize();
+    void Load(nlohmann::json j);
+
+private:
+
+    Ref<Entity> RefPtr;
+
+    Entity();
 };
 
 template <typename T, typename ... Args>
@@ -73,8 +89,9 @@ struct AURORA_API EntityMgr
 	std::vector<Ref<Entity>> registeredEntities;
 
     Ref<Entity> CreateEntity(std::string name="", Ref<Entity> parent=nullptr);
-    Ref<Entity> DuplicateEntity(Ref<Entity> entity);
-
+    Ref<Entity> DuplicateEntity(Ref<Entity> e);
+    Ref<Entity> GetEntity(std::string name);
+ 
     void UpdateAllEntities() const
     {
 	    for (auto registered_entity : registeredEntities)
@@ -82,6 +99,9 @@ struct AURORA_API EntityMgr
             registered_entity->Update();
 	    }
     }
+
+    nlohmann::json Serialize() const;
+    void Load(nlohmann::json j);
 
 };
 

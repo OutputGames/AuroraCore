@@ -28,10 +28,10 @@ public:
 	vec3 color=vec3{1};
 	float roughness = 1, metallic = 0;
 
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
 
 private:
-
-	friend class aclCamera;
 
 	agl::aglUniformBuffer* transformationBuffer = nullptr;
 	agl::aglUniformBuffer* lightingBuffer = nullptr;

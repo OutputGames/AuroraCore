@@ -31,7 +31,7 @@ bool childclass::IsClassType( const std::size_t classType ) const {             
 
 
 #define QUICKCLASS(parentclass, classname) \
-class classname : public parentclass\
+class AURORA_API classname : public parentclass\
 {\
     CLASS_DECLARATION(classname)\
 public:\
@@ -40,9 +40,13 @@ public:\
     }\
     classname() = default; \
 
+#include <memory>
+
 #include "aurora/math/math.hpp"
 #include "aurora/utils/utils.hpp"
 
+class Collider;
+struct Collision;
 struct Entity;
 
 class AURORA_API Component {
@@ -53,7 +57,7 @@ public:
     }
     virtual Ref<Component> clone() const
     {
-        return Ref<Component>(std::make_shared<Component>(*this));
+        return Ref(std::make_shared<Component>(*this));
     }
 public:
 
@@ -70,6 +74,15 @@ public:
     virtual void Init() {}
     virtual void Update() {}
     virtual void Destroy() {}
+
+    virtual void OnCollisionEnter(Collision* Collision) {}
+    virtual void OnCollisionStay(Collision* Collision) {}
+    virtual void OnCollisionExit(Collider* Collision) {}
+
+	virtual nlohmann::json Serialize();
+    virtual void Load(nlohmann::json j);
+
+    std::string ToString();
 
 private:
     std::string                             value = "uninitialized";

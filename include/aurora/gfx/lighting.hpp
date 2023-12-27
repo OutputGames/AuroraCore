@@ -33,15 +33,17 @@ public:
 
 	Color Color = {1,1,1};
 	float Power = 1;
+
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
 };
 
-struct AURORA_API aclLightingMgr
+struct AURORA_API LightingMgr
 {
-    inline static std::vector<Light*> lights;
-	static void Init();
+	std::vector<Light*> lights;
+	void Init();
 
-
-	static LightingSettings GetLightUBO();
+	LightingSettings GetLightUBO();
 };
 
 #endif // LIGHTING_HPP

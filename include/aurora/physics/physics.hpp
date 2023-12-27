@@ -17,6 +17,8 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
 #include "aurora/ecs/component.hpp"
+#include "Jolt/Physics/Character/Character.h"
+#include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
 
 // Layer that objects can be in, determines which other objects it can collide with
 // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
@@ -123,28 +125,13 @@ class AURORA_API aclContactListener : public JPH::ContactListener
 {
 public:
 	// See: ContactListener
-	virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override
-	{
-		std::cout << "Contact validate callback" << std::endl;
+	virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override;
 
-		// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
-	}
+	virtual void			OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
 
-	virtual void			OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-	{
-		std::cout << "A contact was added" << std::endl;
-	}
+	virtual void			OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override;
 
-	virtual void			OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings) override
-	{
-		std::cout << "A contact was persisted" << std::endl;
-	}
-
-	virtual void			OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override
-	{
-		std::cout << "A contact was removed" << std::endl;
-	}
+	virtual void			OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
 };
 
 // An example activation listener
@@ -153,12 +140,12 @@ class AURORA_API aclBodyActivationListener : public JPH::BodyActivationListener
 public:
 	virtual void		OnBodyActivated(const JPH::BodyID& inBodyID, uint64 inBodyUserData) override
 	{
-		std::cout << "A body got activated" << std::endl;
+		//std::cout << "A body got activated" << std::endl;
 	}
 
 	virtual void		OnBodyDeactivated(const JPH::BodyID& inBodyID, uint64 inBodyUserData) override
 	{
-		std::cout << "A body went to sleep" << std::endl;
+		//std::cout << "A body went to sleep" << std::endl;
 	}
 };
 
@@ -176,8 +163,11 @@ struct AURORA_API aclPhysicsMgr
 
 	static void Setup();
 	static void Update(float deltaTime);
+	static void Destroy();
+	static void Uninitialize();
 
 	static JPH::Body* CreateBody(JPH::BodyCreationSettings settings);
+
 	static JPH::BodyCreationSettings GetCreationSettings(JPH::ShapeSettings* settings, vec3 position, quat rotation, JPH::EMotionType motion, JPH::ObjectLayer layer);
 
 	static vec3 GetVec3(JPH::RVec3 v)
@@ -190,12 +180,21 @@ struct AURORA_API aclPhysicsMgr
 		return { q.GetX(), q.GetY(), q.GetZ(),q.GetW() };
 	}
 
+	static JPH::Quat GetQuat(vec3 v)
+	{
+		return { v.x, v.y, v.z,1.0 };
+	}
+
 	static JPH::RVec3 GetVec3(vec3 v)
 	{
 		return JPH::RVec3(v.x, v.y, v.z);
 	}
 
 private:
+
+	IS std::vector<JPH::BodyID> bodies;
+
+
 	IS int frameCount;
 };
 
@@ -242,9 +241,24 @@ public:
 		return nullptr;
 	}
 
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
+
 private:
 
 	JPH::BoxShape* shape;
+
+};
+
+struct Collision
+{
+	Collider* collider1;
+	Collider* collider2;
+
+	vec3 hitNormal;
+
+	std::vector<vec3> collider1ContactPoints;
+	std::vector<vec3> collider2ContactPoints;
 
 };
 
@@ -271,9 +285,40 @@ public:
 		return shape;
 	}
 
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
+
 private:
 
 	JPH::SphereShape* shape;
+};
+
+class AURORA_API CapsuleCollider : public Collider
+{
+	CLASS_DECLARATION(CapsuleCollider)
+
+public:
+	CapsuleCollider(std::string&& initialValue) : Collider(move(initialValue))
+	{
+	}
+
+	CapsuleCollider() = default;
+
+	float Radius = 1;
+	float Height = 2;
+
+	JPH::ShapeSettings* GetShapeSettings() override;
+	void Update() override;
+	void ApplyShape(JPH::Shape* shape) override;
+	JPH::Shape* GetShape() override;
+
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
+
+private:
+
+	JPH::CapsuleShape* shape;
+
 };
 
 class AURORA_API Rigidbody : public Component
@@ -290,6 +335,7 @@ public:
 	void Init() override;
 	void Update() override;
 	void SetPosition(vec3 position);
+	void SetRotation(vec3 rotation);
 	void SetVelocity(vec3 velocity);
 
 	void ApplyForce(vec3 force);
@@ -336,6 +382,19 @@ public:
 		DYNAMIC
 	} motionType = DYNAMIC;
 
+	enum ConstraintType
+	{
+		LOCK_POSITION_X = 1 << 0,
+		LOCK_POSITION_Y = 1 << 1,
+		LOCK_POSITION_Z = 1 << 2,
+		LOCK_ROTATION_X = 1 << 3,
+		LOCK_ROTATION_Y = 1 << 4,
+		LOCK_ROTATION_Z = 1 << 5,
+	} constraint;
+
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
+
 	JPH::Body* operator->()
 	{
 		return body;
@@ -350,5 +409,6 @@ private:
 	glm::vec3 initialPosition, initialRotation, initialScale;
 
 };
+
 
 #endif // PHYSICS_HPP
