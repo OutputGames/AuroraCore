@@ -79,7 +79,7 @@ public:
 		
 	}
 
-	void ModifyTransformationBuffer(TransformationBuffer* bfr)
+	mat4 GetTransformationMatrix()
 	{
 		mat4 model(1.0);
 
@@ -87,9 +87,16 @@ public:
 
 		model = glm::rotate(model, radians(rotation.x), vec3{ 1,0,0 });
 		model = glm::rotate(model, radians(rotation.y), vec3{ 0,1,0 });
-		model = glm::rotate(model, radians(rotation.z), vec3{ 0,0,1 }); 
-		
+		model = glm::rotate(model, radians(rotation.z), vec3{ 0,0,1 });
+
 		model = glm::scale(model, scale);
+
+		return model;
+	}
+
+	void ModifyTransformationBuffer(TransformationBuffer* bfr)
+	{
+		mat4 model = GetTransformationMatrix();
 
 		mat3 normal = transpose(inverse(mat3(model)));
 
@@ -98,6 +105,13 @@ public:
 		bfr->model = model;
 		//bfr->normalMatrix = normal;
 
+	}
+
+	vec3 GetForwardVector()
+	{
+		const mat4 inverted = glm::inverse(GetTransformationMatrix());
+		const vec3 forward = normalize(glm::vec3(inverted[2]));
+		return forward;
 	}
 };
 

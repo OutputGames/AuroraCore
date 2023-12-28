@@ -2,12 +2,15 @@
 
 #include "aurora/ecs/entity.hpp"
 #include "aurora/ecs/scene.hpp"
+#include "Jolt/Physics/Collision/Shape/ScaledShape.h"
 
 CLASS_DEFINITION(Component, Collider)
 CLASS_DEFINITION(Collider, BoxCollider)
 CLASS_DEFINITION(Collider, SphereCollider)
 CLASS_DEFINITION(Collider, CapsuleCollider)
+CLASS_DEFINITION(Component, CharacterController)
 CLASS_DEFINITION(Component, Rigidbody)
+CLASS_DEFINITION(Collider, MeshCollider)
 
 JPH::ShapeSettings* SphereCollider::GetShapeSettings()
 {
@@ -50,11 +53,21 @@ void SphereCollider::Load(nlohmann::json j)
 
 void Rigidbody::Init()
 {
-	Collider* collider = Entity->GetComponent<Collider>();
+	collider = Entity->GetComponent<Collider>();
 
 	JPH::ObjectLayer layer = GetObjectLayer();
 
-	body = aclPhysicsMgr::CreateBody(aclPhysicsMgr::GetCreationSettings(collider->GetShapeSettings(), Entity->Transform.position, quat(Entity->Transform.rotation), static_cast<JPH::EMotionType>(motionType), layer));
+	JPH::ShapeSettings* settings = collider->GetShapeSettings();
+
+
+	JPH::Shape* shape = settings->Create().Get();
+	if (shape->IsValidScale(aclPhysicsMgr::GetVec3(Entity->Transform.scale))) {
+		//shape. = shape->ScaleShape(aclPhysicsMgr::GetVec3(Entity->Transform.scale)).Get();
+	}
+
+	collider->Center *= Entity->Transform.scale;
+
+	body = aclPhysicsMgr::CreateBody(aclPhysicsMgr::GetCreationSettings(shape, Entity->Transform.position, quat(Entity->Transform.rotation * vec3{DEG2RAD}), static_cast<JPH::EMotionType>(motionType), layer));
 
 	body->SetUserData(Entity->Id);
 
@@ -69,21 +82,23 @@ void Rigidbody::Update()
 	vec3 pos = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition());
 	vec3 rot = aclPhysicsMgr::GetVec3(body->GetRotation().GetEulerAngles());
 
-	if (constraint & LOCK_POSITION_X)
+	/*
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_POSITION_X))	
 		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ initialPosition.x,pos.y,pos.z }), GetActivationType());
-	if (constraint & LOCK_POSITION_Y)
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_POSITION_Y))	
 		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ pos.x,initialPosition.y,pos.z }), GetActivationType());
-	if (constraint & LOCK_POSITION_Z)
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_POSITION_Z))
 		aclPhysicsMgr::bodyInterface->SetPosition(body->GetID(), aclPhysicsMgr::GetVec3(vec3{ pos.x,pos.y,initialPosition.z}), GetActivationType());
 
-	if (constraint & LOCK_ROTATION_X)
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_ROTATION_X))	
 		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ initialRotation.x*DEG2RAD,rot.y,rot.z }), GetActivationType());
-	if (constraint & LOCK_ROTATION_Y)
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_ROTATION_Y))
 		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ rot.x,initialRotation.y*DEG2RAD,rot.z }), GetActivationType());
-	if (constraint & LOCK_ROTATION_Z)
+	if (uvector::ContainsElement<ConstraintType>(constraints, LOCK_ROTATION_Z))
 		aclPhysicsMgr::bodyInterface->SetRotation(body->GetID(), aclPhysicsMgr::GetQuat(vec3{ rot.x,rot.y,initialRotation.z*DEG2RAD }), GetActivationType());
-		
-	Entity->Transform.position = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition());
+		*/
+
+	Entity->Transform.position = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition()) + (collider->Center * Entity->Transform.scale);
 
 	Entity->Transform.rotation = aclPhysicsMgr::GetVec3(body->GetRotation().GetEulerAngles()) * vec3 { RAD2DEG };
 
@@ -115,6 +130,11 @@ void Rigidbody::SetRestitution(float f)
 	body->SetRestitution(f);
 }
 
+void Rigidbody::ApplyConstraint(ConstraintType type)
+{
+	constraints.push_back(type);
+}
+
 nlohmann::json Rigidbody::Serialize()
 {
 	nlohmann::json j = Component::Serialize();
@@ -136,10 +156,106 @@ void Rigidbody::Reset()
 	SetVelocity(vec3{ 0 });
 }
 
+void CharacterController::Init()
+{
+	collider = Entity->GetComponent<Collider>();
+
+	JPH::ObjectLayer layer = GetObjectLayer();
+
+	// Create 'player' character
+	JPH::CharacterSettings* settings = new JPH::CharacterSettings();
+	settings->mMaxSlopeAngle = JPH::DegreesToRadians(45.0f);
+	settings->mLayer = layer;
+	settings->mShape = collider->GetShapeSettings()->Create().Get();
+
+	if (settings->mShape->IsValidScale(aclPhysicsMgr::GetVec3(Entity->Transform.scale))) {
+		settings->mShape = settings->mShape->ScaleShape(aclPhysicsMgr::GetVec3(Entity->Transform.scale)).Get();
+	}
+
+	float radius = settings->mShape->GetInnerRadius();
+
+	settings->mFriction = 0.5f;
+	settings->mSupportingVolume = JPH::Plane(JPH::Vec3::sAxisY(), radius); // Accept contacts that touch the lower sphere of the capsule
+
+	body = aclPhysicsMgr::CreateCharacter(settings, 
+		Entity->Transform.position,
+          quat(Entity->Transform.rotation * vec3{DEG2RAD}), GetActivationType(),
+          Entity->Id);
+
+	initialPosition = Entity->Transform.position;
+	initialRotation = Entity->Transform.rotation;
+}
+
+void CharacterController::Update()
+{
+	Entity->Transform.position = aclPhysicsMgr::GetVec3(body->GetCenterOfMassPosition()) + (collider->Center * Entity->Transform.scale);
+
+	Entity->Transform.rotation = aclPhysicsMgr::GetVec3(body->GetRotation().GetEulerAngles()) * vec3 { RAD2DEG };
+}
+
+void CharacterController::SetPosition(vec3 position)
+{
+	aclPhysicsMgr::bodyInterface->SetPosition(body->GetBodyID(), aclPhysicsMgr::GetVec3(position), GetActivationType());
+}
+
+void CharacterController::SetRotation(vec3 rotation)
+{
+	aclPhysicsMgr::bodyInterface->SetRotation(body->GetBodyID(),aclPhysicsMgr::GetQuat(rotation), GetActivationType());
+}
+
+void CharacterController::SetVelocity(vec3 velocity)
+{
+	aclPhysicsMgr::bodyInterface->SetLinearVelocity(body->GetBodyID(), aclPhysicsMgr::GetVec3(velocity));
+}
+
+vec3 CharacterController::GetVelocity()
+{
+	return aclPhysicsMgr::GetVec3(aclPhysicsMgr::bodyInterface->GetLinearVelocity(body->GetBodyID()));
+}
+
+JPH::Character::EGroundState CharacterController::GetState()
+{
+	return body->GetGroundState();
+}
+
+void CharacterController::Reset()
+{
+	SetPosition(initialPosition);
+	//SetRotation(initialRotation);
+	SetVelocity(vec3{ 0 });
+}
+
+JPH::ShapeSettings* MeshCollider::GetShapeSettings()
+{
+
+	JPH::VertexList list;
+	JPH::IndexedTriangleList triList;
+
+	for (auto vertex : mesh->vertices)
+	{
+		list.push_back(aclPhysicsMgr::GetFloat3(vertex.position * Entity->Transform.scale));
+	}
+
+	for (int i = 0; i < mesh->indices.size(); i += 3)
+	{
+		JPH::IndexedTriangle tri(mesh->indices[i], mesh->indices[i + 1], mesh->indices[i + 2]);
+		triList.push_back(tri);
+	}
+
+
+
+	return new JPH::MeshShapeSettings{ list,triList };
+}
+
+void MeshCollider::ApplyShape(JPH::Shape* shape)
+{
+	this->shape = static_cast<JPH::MeshShape*>(shape);
+}
+
 
 JPH::ShapeSettings* BoxCollider::GetShapeSettings()
 {
-	return new JPH::BoxShapeSettings(aclPhysicsMgr::GetVec3(Extents / vec3{ 2 }));
+	return new JPH::BoxShapeSettings(aclPhysicsMgr::GetVec3(Extents * Entity->Transform.scale / vec3{ 2.0f }));
 }
 
 void BoxCollider::Update()
@@ -417,10 +533,17 @@ JPH::Body* aclPhysicsMgr::CreateBody(JPH::BodyCreationSettings settings)
 	return body;
 }
 
-JPH::BodyCreationSettings aclPhysicsMgr::GetCreationSettings(JPH::ShapeSettings* settings, vec3 position, quat rotation,
-	JPH::EMotionType motion, JPH::ObjectLayer layer)
+JPH::Character* aclPhysicsMgr::CreateCharacter(JPH::CharacterSettings* settings, vec3 position, quat rotation, JPH::EActivation activation, u64 userData)
 {
-	JPH::ShapeRefC shape = settings->Create().Get();
+	JPH::Character* mCharacter = new JPH::Character(settings, GetVec3(position), GetQuat(rotation), userData, system);
+	mCharacter->AddToPhysicsSystem(activation);
+
+	return mCharacter;
+}
+
+JPH::BodyCreationSettings aclPhysicsMgr::GetCreationSettings(JPH::Shape* shape, vec3 position, quat rotation,
+                                                             JPH::EMotionType motion, JPH::ObjectLayer layer)
+{
 	return { shape, JPH::RVec3(position.x, position.y, position.z), JPH::Quat(rotation.x, rotation.y, rotation.z, rotation.w), motion, layer };
 }
 
@@ -432,6 +555,20 @@ JPH::ShapeSettings* Collider::GetShapeSettings()
 void Collider::ApplyShape(JPH::Shape* shape)
 {
 
+}
+
+nlohmann::json Collider::Serialize()
+{
+	json j;
+
+	j["Center"] = MathSerializer::SerializeVec3(Center);
+
+	return j;
+}
+
+void Collider::Load(nlohmann::json j)
+{
+	Center = MathSerializer::DeserializeVec3(j["Center"]);
 }
 
 void CapsuleCollider::ApplyShape(JPH::Shape* shape)

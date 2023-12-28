@@ -16,9 +16,11 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
+#include "agl/agl.hpp"
 #include "aurora/ecs/component.hpp"
 #include "Jolt/Physics/Character/Character.h"
 #include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
+#include "Jolt/Physics/Collision/Shape/MeshShape.h"
 
 // Layer that objects can be in, determines which other objects it can collide with
 // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
@@ -167,8 +169,9 @@ struct AURORA_API aclPhysicsMgr
 	static void Uninitialize();
 
 	static JPH::Body* CreateBody(JPH::BodyCreationSettings settings);
+	static JPH::Character* CreateCharacter(JPH::CharacterSettings* settings, vec3 position, quat rotation,JPH::EActivation activation, u64 userData);
 
-	static JPH::BodyCreationSettings GetCreationSettings(JPH::ShapeSettings* settings, vec3 position, quat rotation, JPH::EMotionType motion, JPH::ObjectLayer layer);
+	static JPH::BodyCreationSettings GetCreationSettings(JPH::Shape* shape, vec3 position, quat rotation, JPH::EMotionType motion, JPH::ObjectLayer layer);
 
 	static vec3 GetVec3(JPH::RVec3 v)
 	{
@@ -185,9 +188,19 @@ struct AURORA_API aclPhysicsMgr
 		return { v.x, v.y, v.z,1.0 };
 	}
 
+	static JPH::Quat GetQuat(quat v)
+	{
+		return { v.x, v.y, v.z,v.w };
+	}
+
 	static JPH::RVec3 GetVec3(vec3 v)
 	{
 		return JPH::RVec3(v.x, v.y, v.z);
+	}
+
+	static JPH::Float3 GetFloat3(vec3 v)
+	{
+		return JPH::Float3(v.x, v.y, v.z);
 	}
 
 private:
@@ -214,6 +227,10 @@ public:
 	virtual JPH::Shape* GetShape() {
 		return nullptr;
 	}
+	vec3 Center;
+
+	nlohmann::json Serialize() override;
+	void Load(nlohmann::json j) override;
 
 private:
 
@@ -238,7 +255,7 @@ public:
 	void Update() override;
 	void ApplyShape(JPH::Shape* shape) override;
 	JPH::Shape* GetShape() override {
-		return nullptr;
+		return shape;
 	}
 
 	nlohmann::json Serialize() override;
@@ -384,13 +401,15 @@ public:
 
 	enum ConstraintType
 	{
-		LOCK_POSITION_X = 1 << 0,
-		LOCK_POSITION_Y = 1 << 1,
-		LOCK_POSITION_Z = 1 << 2,
-		LOCK_ROTATION_X = 1 << 3,
-		LOCK_ROTATION_Y = 1 << 4,
-		LOCK_ROTATION_Z = 1 << 5,
-	} constraint;
+		LOCK_POSITION_X,
+		LOCK_POSITION_Y,
+		LOCK_POSITION_Z,
+		LOCK_ROTATION_X,
+		LOCK_ROTATION_Y,
+		LOCK_ROTATION_Z,
+	};
+
+	void ApplyConstraint(ConstraintType type);
 
 	nlohmann::json Serialize() override;
 	void Load(nlohmann::json j) override;
@@ -406,9 +425,112 @@ private:
 
 	JPH::Body* body=nullptr;
 
+	Collider* collider;
+
+	glm::vec3 initialPosition, initialRotation, initialScale;
+
+	std::vector<ConstraintType> constraints;
+
+};
+
+class AURORA_API CharacterController : public Component
+{
+	CLASS_DECLARATION(CharacterController)
+
+public:
+	CharacterController(std::string&& initialValue) : Component(move(initialValue))
+	{
+	}
+
+	CharacterController() = default;
+
+	void Init() override;
+	void Update() override;
+
+	void SetPosition(vec3 position);
+	void SetRotation(vec3 rotation);
+	void SetVelocity(vec3 velocity);
+
+	vec3 GetVelocity();
+	JPH::Character::EGroundState GetState();
+
+	void Reset();
+
+	float Radius;
+
+	JPH::EActivation GetActivationType()
+	{
+		switch (motionType)
+		{
+		case STATIC:
+			return JPH::EActivation::DontActivate;
+			break;
+		case DYNAMIC:
+			return JPH::EActivation::Activate;
+			break;
+		default:
+			return JPH::EActivation::Activate;
+			break;
+		}
+	}
+
+	JPH::ObjectLayer GetObjectLayer()
+	{
+		switch (motionType)
+		{
+		case STATIC:
+			return Layers::NON_MOVING;
+			break;
+		case DYNAMIC:
+			return Layers::MOVING;
+			break;
+		default:
+			return Layers::MOVING;
+			break;
+		}
+	}
+
+	enum MotionType
+	{
+		STATIC,
+		KINEMATIC,
+		DYNAMIC
+	} motionType = DYNAMIC;
+
+private:
+
+	JPH::Character* body;
+
+	Collider* collider;
+
 	glm::vec3 initialPosition, initialRotation, initialScale;
 
 };
 
+class AURORA_API MeshCollider : public Collider
+{
+	CLASS_DECLARATION(MeshCollider)
+
+public:
+	MeshCollider(std::string&& initialValue) : Collider(move(initialValue))
+	{
+	}
+
+	MeshCollider() = default;
+
+	agl::aglMesh* mesh = nullptr;
+
+	JPH::ShapeSettings* GetShapeSettings() override;
+	void ApplyShape(JPH::Shape* shape) override;
+	JPH::Shape* GetShape() override {
+		return shape;
+	}
+
+
+private:
+
+	JPH::MeshShape* shape;
+
+};
 
 #endif // PHYSICS_HPP

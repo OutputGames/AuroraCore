@@ -91,7 +91,7 @@ struct AURORA_API EntityMgr
     Ref<Entity> CreateEntity(std::string name="", Ref<Entity> parent=nullptr);
     Ref<Entity> DuplicateEntity(Ref<Entity> e);
     Ref<Entity> GetEntity(std::string name);
- 
+
     void UpdateAllEntities() const
     {
 	    for (auto registered_entity : registeredEntities)

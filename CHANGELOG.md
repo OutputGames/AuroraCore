@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning].
     * Theoretical support for gyro tracking
 
 * Physics module in `AuroraCore` using [JoltPhysics](https://github.com/jrouwe/JoltPhysics)
-    * OnCollisionEnter, OnCollisionExit, OnCollisionStay functions added to components
+    * `OnCollisionEnter`, `OnCollisionExit`, `OnCollisionStay` functions added to components
+
+    * Added `CapsuleCollider`, `MeshCollider`, `CharacterController` to `aclPhysics` (**12/28/23**)
 
 * Lighting module in AuroraCore
     * Support for PBR
@@ -31,23 +33,41 @@ and this project adheres to [Semantic Versioning].
 * Texture Mipmapping
 
 * Scene Control (Serialization, Deserialization)
+    * Texture, Shader, Entity, and other serializaton/deserialization methods added using `nlohmann-json`
 
 * Network Module in `AuroraCore` using [Enet](https://github.com/lsalzman/enet)
 
+* New executable, `AuroraEditor` with tools for editing and creating scenes, making shaders, etc.
+
+    * Added image support to `agl_ext_imgui`
+
+* New utility added to `AuroraUtils`:  `uvector` for finding if an element is in a vector, and finding the index of an element in a vector
+
+* `AuroraFilesystem` now supports writing raw data to header files using the `DataAsCode` exporter from [raylib](github.com/raysan5/raylib)
+    * Added writing to a file using a string, and getting file names
+
+* Conversion from `Color` to `vec4` and vice-versa in the `Color` class of `AuroraUtils`
+
+* Added context and event processing to `agl_ext_imgui`
+
+* Added center property to `Collider` and it's subclasses for offseting the returned positions
+
+* Added `GetTransformationMatrix` method to `Transform` class for ease of matrix calculations
+    * Added `GetForwardVector` method to `Transform` & `Camera`
 
 
 ### Changed
 
 * Window creation backend changed to SDL from GLFW
 
-* Added Plane shape to agl_ext_primitives
-
-* Original agl_ext removed
+* Added Plane & Capsule shape to `agl_ext_primitives` using `par_shape` and `par_octasphere`
+    * Replaced predefined sphere model with procedurally generated sphere model
 
 * AuroraCore now builds to a library and not an executable file
     * #### Things the DLL Update changed
         * Uniform buffers no longer use a template to prevent explicit instantiation
 
+* `Ref<T>` classes cannot directly be initialized using pointers
 
 ### Deprecated
 
@@ -57,9 +77,15 @@ and this project adheres to [Semantic Versioning].
     * I'm working on experimental features currently, and I don't want to have to change structures between libraries. Deko3D, Citro3D, and Metal are somewhat related to the structure of Vulkan, meaning there won't be much difference between the two.
     * **OpenGL support will come back at a later date** when the essential features of the graphics library are completed.
 
+* Redundant `agl_ext` and old `UniformBuffer` of AGL removed
+    * Nothing was using the old `agl_ext` in `ext.hpp`
+    * `UniformBuffer<T>` was replaced with `aglUniformBuffer` (no template) in `agl.hpp`
+
 ### Fixed
 
-* Window unable to close with X button using GLFW
+* Window being unable to close with X button using GLFW
+
+* `BoxCollider` not returning shape when requested
 
 ### Security
 

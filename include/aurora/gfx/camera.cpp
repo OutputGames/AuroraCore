@@ -21,6 +21,13 @@ mat4 Camera::GetProjectionMatrix()
 	return proj;
 }
 
+vec3 Camera::GetForwardVector()
+{
+	const mat4 inverted = glm::inverse(GetViewMatrix());
+	const vec3 forward = normalize(glm::vec3(inverted[2]));
+	return forward;
+}
+
 void Camera::ModifyTransformationBuffer(TransformationBuffer* bfr)
 {
 	bfr->view = GetViewMatrix();

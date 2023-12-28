@@ -33,6 +33,8 @@ public:
 
 	mat4 GetProjectionMatrix();
 
+	vec3 GetForwardVector();
+
 	void ModifyTransformationBuffer(TransformationBuffer* bfr);
 
 	inline static Camera* Main = nullptr;

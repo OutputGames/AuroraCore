@@ -10,5 +10,5 @@
 void aclComponentManager::Init()
 {
 
-	ComponentRegistry::RegisterComponent(ComponentRegistry::ComponentRegister<AudioPlayer, Light, MeshRenderer, Camera, Rigidbody, BoxCollider, SphereCollider, CapsuleCollider>());
+	ComponentRegistry::RegisterComponent(ComponentRegistry::ComponentRegister<AudioPlayer, Light, MeshRenderer, Camera, Rigidbody, BoxCollider, SphereCollider, CapsuleCollider, CharacterController, MeshCollider>());
 }
